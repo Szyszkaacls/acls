@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix  # Dodajemy import
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)  # Dodajemy middleware ProxyFix
+
 app.secret_key = "secret_key"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///service_hours.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
