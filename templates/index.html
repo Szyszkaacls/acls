@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Hours Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, {{ username }}</h1>
+        <form action="/logout" method="post">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+        <hr>
+        <h2>Add Service Hours</h2>
+        <form action="/add_hours" method="post">
+            <label for="hours">Hours:</label>
+            <input type="number" id="hours" name="hours" required>
+            <button type="submit" class="add-hours-btn">Add Hours</button>
+        </form>
+        <hr>
+        <h2>Service Hours</h2>
+        <ul>
+            {% for entry in service_hours %}
+                <li>Hours: {{ entry.hours }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
