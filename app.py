@@ -1,13 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+import os
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.middleware.proxy_fix import ProxyFix  # Dodajemy import
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app)  # Dodajemy middleware ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
-app.secret_key = "secret_key"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///service_hours.db'
+# Ustawienie klucza sekretnego z wartości zmiennej środowiskowej lub domyślnej wartości
+app.secret_key = os.environ.get("SECRET_KEY", "secret_key")
+
+# Ustawienie portu na wartość zmiennej środowiskowej PORT lub domyślnie na 5000
+port = int(os.environ.get("PORT", 5000))
+
+# Ustawienie URI bazy danych na wartość zmiennej środowiskowej lub domyślnej wartości
+db_uri = os.environ.get("DATABASE_URL", "sqlite:///service_hours.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -81,7 +89,13 @@ def add_hours():
         db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/favicon.ico')
+def favicon():
+    # Zwróć plik favicon.ico z katalogu static
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        app.run(debug=True)
+        # Użyj zmiennej port do uruchomienia aplikacji
+        app.run(debug=False, port=port)
